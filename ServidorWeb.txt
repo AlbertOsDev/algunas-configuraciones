@@ -1,0 +1,156 @@
+Cómo instalar el servidor web Apache en Ubuntu 20.04
+
+Instalar ssh
+sudo apt install openssh-server
+sudo systemctl enable ssh
+sudo systemctl start ssh
+sudo ufw allow ssh
+
+
+1: Paso 1: Instalar Apache
+sudo apt update
+sudo apt install apache2
+
+2: Paso 2: Ajustar el firewall
+sudo ufw app list
+Obtendrá una lista de los perfiles de aplicación:
+Output
+Available applications:
+  Apache
+  Apache Full
+  Apache Secure
+  OpenSSH
+ hay tres perfiles disponibles para Apache:
+
+Apache: este perfil abre solo el puerto 80 (tráfico web normal no cifrado)
+Apache Full: este perfil abre el puerto 80 (tráfico web normal no cifrado) y el puerto 443 (tráfico TLS/SSL cifrado)
+Apache Secure: este perfil abre solo el puerto 443 (tráfico TLS/SSL cifrado)
+Se recomienda habilitar el perfil más restrictivo, que de todos modos permitirá el tráfico que configuró. Debido a que en esta guía aún no configuramos SSL para nuestro servidor, solo deberemos permitir el tráfico en el puerto 80:
+
+Para habilitar UFW, utilice este comando:
+sudo ufw enable
+
+
+sudo ufw allow 'Apache'
+Puede verificar el cambio escribiendo lo siguiente:
+sudo ufw status
+El resultado proporcionará una lista del tráfico de HTTP que se permite:
+Output
+Status: active
+
+To                         Action      From
+--                         ------      ----
+OpenSSH                    ALLOW       Anywhere                  
+Apache                     ALLOW       Anywhere                
+OpenSSH (v6)               ALLOW       Anywhere (v6)             
+Apache (v6)                ALLOW       Anywhere (v6)
+
+Como lo indica el resultado, el perfil se activó para permitir el acceso al servidor web Apache.
+
+3: Paso 3: Comprobar su servidor web
+sudo systemctl status apache2
+
+si no conoce la dirección IP 
+hostname -I
+su dirección IP pública como aparece en otra ubicación en Internet:
+curl -4 icanhazip.com
+
+
+4: Paso 4: Administrar el proceso de Apache
+Para detener su servidor web
+sudo systemctl stop apache2
+Para iniciar el servidor web cuando no esté activo
+sudo systemctl start apache2
+Para detener y luego iniciar el servicio de nuevo
+sudo systemctl restart apache2
+para iniciarse automáticamente cuando el servidor lo hace
+sudo systemctl enable apache2
+deshabilite este comportamiento escribiendo lo siguiente:
+sudo systemctl enable apache2
+
+5:Paso 5: Configurar hosts virtuales (recomendado)
+Cree el directorio
+sudo mkdir /var/www/html/your_domain
+A continuación, asigne la propiedad del directorio con la variable de entorno $USER:
+sudo chown -R $USER:$USER /var/www/hmtl/your_domain
+Para asegurarse de que sus permisos sean correctos y permitir al propietario leer, escribir y ejecutar los archivos, y a la vez conceder solo permisos de lectura y ejecución a los grupos y terceros, puede ingresar el siguiente comando:
+sudo chmod -R 755 /var/www/html/your_domain
+A continuación, cree una página de ejemplo index.html utilizando nano
+sudo nano /var/www/html/your_domain/index.html
+Dentro de ella, agregue el siguiente ejemplo de HTML:
+
+<html>
+    <head>
+        <title>Welcome to Your_domain!</title>
+    </head>
+    <body>
+        <h1>Success!  The your_domain virtual host is working!</h1>
+    </body>
+</html>
+
+ crear uno nuevo en /etc/apache2/sites-available/your_domain.conf:
+sudo nano /etc/apache2/sites-available/your_domain.conf
+Péguelo en el siguiente bloque de configuración, similar al predeterminado, pero actualizado para nuestro nuevo directorio y nombre de dominio:
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    ServerName your_domain
+    ServerAlias www.your_domain
+    DocumentRoot /var/www/html/your_domain
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+
+Habilitaremos el archivo con la herramienta a2ensite:
+
+sudo a2ensite your_domain.conf
+Deshabilite el sitio predeterminado definido en 000-default.conf:
+sudo a2dissite 000-default.conf
+A continuación, realizaremos una prueba para ver que no haya errores de configuración:
+sudo apache2ctl configtest
+Debería obtener el siguiente resultado:
+Output
+Syntax OK
+Reinicie Apache para implementar sus cambios:
+sudo systemctl restart apache2
+Con esto, Apache debería ser el servidor de su nombre de dominio. Puede probarlo visitando http://your_domain
+
+# Instalar PHP en Ubuntu Server
+sudo apt-get install php8.1 php8.1-cli php8.1-common php8.1-imap php8.1-redis php8.1-snmp php8.1-xml php8.1-zip php8.1-mbstring php8.1-curl php8.1-gd php8.1-mysql
+sudo apt-get install -y php8.1-cli php8.1-common php8.1-mysql php8.1-zip php8.1-gd php8.1-mbstring php8.1-curl php8.1-xml php8.1-bcmath
+
+
+#3 Instalar Mysql-server
+sudo apt install mysql-server
+Confirmamos el estado de MySQL:
+sudo systemctl status mysql.service
+Iniciamos el servicio en caso de ser necesario:
+sudo systemctl start mysql.service
+Habilitamos el servicio en el arranque de Ubuntu:
+sudo systemctl enable mysql.service
+Accedemos a MySQL:
+sudo mysql
+Establecemos la contraseña de root:
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'CONTRASEÑA';
+exit;
+
+# Instalar phpmyadmin
+sudo apt install phpmyadmin php-mbstring php-zip php-gd php-json php-curl
+
+
+
+NextCloud
+https://download.nextcloud.com/server/releases/
+
+Zip
+sudo apt-get install rar unrar unace zip unzip p7zip-full p7zip-rar sharutils mpack arj cabextract file-roller uudeview
+
+
+
+
+Lalo
+Lalito**654321
+
+
+
+
+

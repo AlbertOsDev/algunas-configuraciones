@@ -1,0 +1,4 @@
+C:\ProgramData\Boole & Partners
+
+Cuando se instala QuickDesign es en 
+C:\Users\PC-1\Desktop\PolyBoard-v7.5-en
